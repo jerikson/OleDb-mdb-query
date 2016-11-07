@@ -6,6 +6,7 @@ Description:
     https://www.google.com/basepages/producttype/taxonomy-with-ids.en-US.txt
 */
 using System;
+using System.Data;
 using System.Data.OleDb;
 namespace GoogleMdbTest
 {
@@ -14,16 +15,18 @@ namespace GoogleMdbTest
         public static string ConnectionString = (@"Provider=Microsoft.Jet.OLEDB.4.0;Data Source = D:\dev\Github\Jenpbiz\Jenpbiz\GoogleCategories.mdb");
         static void Main(string[] args)
         {
-            ReadData(ConnectionString);
+            ReadData(ConnectionString, "Software");
         }
 
-        private static void ReadData(string connectionString)
+        private static void ReadData(string connectionString, string searcString)
         {
-            string queryString = "SELECT F1, F2, F3, F4, F5, F6, F7, F8 FROM GoogleCategories_Table";
+            //string queryString = "SELECT F1, F2, F3, F4, F5, F6, F7, F8 FROM GoogleCategories_Table";
+            string queryString = "SELECT * FROM GoogleCategories_Table WHERE F2 LIKE '%' + @CATEGORY +'%' ";
 
             using (OleDbConnection connection = new OleDbConnection(ConnectionString))
             {
                 OleDbCommand command = new OleDbCommand(queryString, connection);
+                command.Parameters.Add("@CATEGORY", OleDbType.Char, 50).Value = searcString;
                 Console.WriteLine("Establishing connection . . .");
                 connection.Open();
                 OleDbDataReader reader;
@@ -52,7 +55,10 @@ namespace GoogleMdbTest
                 reader.Close();
                 Console.WriteLine("Connection closed . . .");
             }
+          
         }
+
+
 
     }
 }
